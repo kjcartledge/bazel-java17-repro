@@ -2,7 +2,6 @@ load(
   "@bazel_tools//tools/jdk:default_java_toolchain.bzl",
   "default_java_toolchain", "DEFAULT_TOOLCHAIN_CONFIGURATION", "BASE_JDK9_JVM_OPTS", "DEFAULT_JAVACOPTS"
 )
-load("@rules_antlr//antlr:antlr4.bzl", "antlr")
 
 default_java_toolchain(
   name = "repository_default_toolchain",
@@ -33,17 +32,15 @@ java_library(
 # Repro.java:1: error: could not locate class file for java.lang.Record
 # public record Repro(int value) {
 #
-# Attempting to add "build --tool_java_runtime_version=remotejdk_17" to .bazelrc
-# causes an exception within ErrorProne coming from the rules_antlr library. :(
+# Adding the following to .bazelrc:
+# build --tool_java_language_version=17
+# build --tool_java_runtime_version=remotejdk_17
+#
+# Causes other errors:
+# error: invalid source release 8 with --enable-preview
+# (preview language features are only supported for release 17)
 java_library(
     name = "other",
     srcs = ["Other.java"],
     deps = [":repro"],
-)
-
-antlr(
-    name = "example_antlr",
-    srcs = ["Example.g4"],
-    package = "example",
-    visitor = True,
 )
